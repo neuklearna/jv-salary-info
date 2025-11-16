@@ -1,49 +1,35 @@
 package core.basesyntax;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 public class SalaryInfo {
+    private static final DateTimeFormatter DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
     public String getSalaryInfo(String[] names, String[] data,
                                 String dateFrom, String dateTo) {
-        String[] partsDateFrom = dateFrom.split("\\.");
-        int dayFrom = Integer.parseInt(partsDateFrom[0]);
-        int monthFrom = Integer.parseInt(partsDateFrom[1]);
-        int yearFrom = Integer.parseInt(partsDateFrom[2]);
-
-        String[] partsDateTo = dateTo.split("\\.");
-        int dayTo = Integer.parseInt(partsDateTo[0]);
-        int monthTo = Integer.parseInt(partsDateTo[1]);
-        int yearTo = Integer.parseInt(partsDateTo[2]);
+        LocalDate startDate = LocalDate.parse(dateFrom, DATE_FORMATTER);
+        LocalDate endDate = LocalDate.parse(dateTo, DATE_FORMATTER);
 
         int[] salaries = new int[names.length];
-        Map<String, Integer> nameToIndex = new HashMap<>();
-        for (int i = 0; i < names.length; i++) {
-            nameToIndex.put(names[i], i);
-        }
-
-        int dateFromAsNumber = yearFrom * YEAR_MULTIPLIER
-                + monthFrom * MONTH_MULTIPLIER + dayFrom;
-        int dateToAsNumber = yearTo * YEAR_MULTIPLIER
-                + monthTo * MONTH_MULTIPLIER + dayTo;
 
         for (int i = 0; i < data.length; i++) {
-            String jednaLinia = data[i];
-            String[] parts = jednaLinia.split(" ");
+            String[] parts = data[i].split(" ");
+            LocalDate workDate = LocalDate.parse(parts[0], DATE_FORMATTER);
 
-            String dataZLinii = parts[0];
-            String[] partsData = dataZLinii.split("\\.");
-            int day = Integer.parseInt(partsData[0]);
-            int month = Integer.parseInt(partsData[1]);
-            int year = Integer.parseInt(partsData[2]);
-            int dataAsNumber = year * YEAR_MULTIPLIER + month * MONTH_MULTIPLIER + day;
-
-            int hours = Integer.parseInt(parts[2]);
-            int hourlyPay = Integer.parseInt(parts[3]);
-
-            if (dataAsNumber >= dateFromAsNumber && dataAsNumber <= dateToAsNumber) {
+            if ((workDate.isAfter(startDate) || workDate.isEqual(startDate))
+                    && (workDate.isBefore(endDate) || workDate.isEqual(endDate))) {
+                int hours = Integer.parseInt(parts[2]);
+                int hourlyPay = Integer.parseInt(parts[3]);
                 int salary = hours * hourlyPay;
-                String name = parts[1];
-                if (nameToIndex.containsKey(name)) {
-                    int index = nameToIndex.get(name);
-                    salaries[index] += salary;
+                String employeeName = parts[1];
+
+                for (int j = 0; j < names.length; j++) {
+                    if (names[j].equals(employeeName)) {
+                        salaries[j] += salary;
+                        break;
+                    }
                 }
             }
         }
@@ -53,14 +39,14 @@ public class SalaryInfo {
                 .append(dateFrom)
                 .append(" - ")
                 .append(dateTo)
-                .append("\n");
+                .append(System.lineSeparator());
 
-        for (int b = 0; b < salaries.length; b++) {
-            result.append(names[b])
+        for (int i = 0; i < names.length; i++) {
+            result.append(names[i])
                     .append(" - ")
-                    .append(salaries[b]);
-            if (b < salaries.length - 1) {
-                result.append("\n");
+                    .append(salaries[i]);
+            if (i < names.length - 1) {
+                result.append(System.lineSeparator());
             }
         }
 
