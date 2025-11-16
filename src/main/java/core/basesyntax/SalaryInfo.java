@@ -14,9 +14,15 @@ public class SalaryInfo {
         int yearTo = Integer.parseInt(partsDateTo[2]);
 
         int[] salaries = new int[names.length];
+        Map<String, Integer> nameToIndex = new HashMap<>();
+        for (int i = 0; i < names.length; i++) {
+            nameToIndex.put(names[i], i);
+        }
 
-        int dateFromAsNumber = yearFrom * 10000 + monthFrom * 100 + dayFrom;
-        int dateToAsNumber = yearTo * 10000 + monthTo * 100 + dayTo;
+        int dateFromAsNumber = yearFrom * YEAR_MULTIPLIER
+                + monthFrom * MONTH_MULTIPLIER + dayFrom;
+        int dateToAsNumber = yearTo * YEAR_MULTIPLIER
+                + monthTo * MONTH_MULTIPLIER + dayTo;
 
         for (int i = 0; i < data.length; i++) {
             String jednaLinia = data[i];
@@ -27,18 +33,17 @@ public class SalaryInfo {
             int day = Integer.parseInt(partsData[0]);
             int month = Integer.parseInt(partsData[1]);
             int year = Integer.parseInt(partsData[2]);
-            int dataAsNumber = year * 10000 + month * 100 + day;
+            int dataAsNumber = year * YEAR_MULTIPLIER + month * MONTH_MULTIPLIER + day;
 
             int hours = Integer.parseInt(parts[2]);
             int hourlyPay = Integer.parseInt(parts[3]);
 
             if (dataAsNumber >= dateFromAsNumber && dataAsNumber <= dateToAsNumber) {
                 int salary = hours * hourlyPay;
-
-                for (int a = 0; a < names.length; a++) {
-                    if (names[a].equals(parts[1])) {
-                        salaries[a] = salaries[a] + salary;
-                    }
+                String name = parts[1];
+                if (nameToIndex.containsKey(name)) {
+                    int index = nameToIndex.get(name);
+                    salaries[index] += salary;
                 }
             }
         }
