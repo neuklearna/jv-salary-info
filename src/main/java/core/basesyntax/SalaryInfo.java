@@ -53,8 +53,10 @@ public class SalaryInfo {
         for (int b = 0; b < salaries.length; b++) {
             result.append(names[b])
                     .append(" - ")
-                    .append(salaries[b])
-                    .append("\n");
+                    .append(salaries[b]);
+            if (b < salaries.length - 1) {
+                result.append("\n");
+            }
         }
 
         return result.toString();
